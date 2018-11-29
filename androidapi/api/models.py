@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 class Pessoa(models.Model):
     nascimento = models.DateField(null=True, blank=True)
-    #cpf = models.CharField(max_length=11, blank=True)
+    status = models.BooleanField(null=False, blank=False, default=True)
     endereco = models.CharField(max_length=100, blank=True)
     telefone = models.CharField(max_length=15, blank=True)
 

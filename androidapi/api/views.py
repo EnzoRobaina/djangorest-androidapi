@@ -15,7 +15,7 @@ class UsuarioViewSet(viewsets.ModelViewSet, APIView):
     """
     permission_classes = (IsAuthenticated,)
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
-    queryset = models.Usuario.objects.all()
+    queryset = models.Usuario.objects.all().order_by('-date_joined')
     serializer_class = serializers.UsuarioSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username', 'first_name', 'last_name')

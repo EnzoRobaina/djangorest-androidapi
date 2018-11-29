@@ -15,4 +15,14 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Usuario
-        fields = ('__all__')
+        fields = ('password',
+                  'is_superuser',
+                  'username', 
+                  'first_name', 
+                  'last_name', 
+                  'email', 
+                  'nascimento', 
+                  'telefone', 
+                  'endereco', 
+                  'status', 
+                  'user_permissions')
