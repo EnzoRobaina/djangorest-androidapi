@@ -1,13 +1,18 @@
-from django.contrib.auth.models import User, Group
 from rest_framework import serializers
+from androidapi.api import models
+from django.contrib.auth.hashers import make_password
+from rest_framework.exceptions import ValidationError
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UsuarioSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        validated_data['password'] = make_password(validated_data['password'])
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        if 'password' in validated_data.keys():
+            validated_data['password'] = make_password(validated_data['password'])
+        return super().update(instance, validated_data)
+
     class Meta:
-        model = User
-        fields = ('url', 'username', 'email', 'groups')
-
-
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Group
-        fields = ('url', 'name')
+        model = models.Usuario
+        fields = ('__all__')
