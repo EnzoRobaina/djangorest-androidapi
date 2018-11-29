@@ -12,6 +12,6 @@ router.register('usuarios', views.UsuarioViewSet)
 urlpatterns = [
     path('', views.Index.as_view(), name="Index"),
     url('api/', include(router.urls)),
-    url('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
-    #path('rest-auth/', include('rest_auth.urls')),
+    url('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('rest-auth/', include('rest_auth.urls')),
 ]

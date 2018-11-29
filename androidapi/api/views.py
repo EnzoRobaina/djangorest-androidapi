@@ -13,7 +13,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 class Index(APIView):
-    renderer_classes = (JSONRenderer, )
+    renderer_classes = (JSONRenderer,)
     permission_classes = (IsAuthenticated,)
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
@@ -40,7 +40,7 @@ class UsuarioViewSet(viewsets.ModelViewSet, APIView):
     def get_queryset(self):
         if self.request.user.is_superuser:
             return models.Usuario.objects.all()
-
+        
         return models.Usuario.objects.all().filter(pk=self.request.user.id)
 
     def create(self, request, *args, **kwargs):
