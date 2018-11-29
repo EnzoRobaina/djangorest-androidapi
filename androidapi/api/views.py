@@ -8,6 +8,22 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from androidapi.api import models, serializers
+from django.views import View
+
+class Index(APIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
+
+    def get(self, request, format=None):
+        if not request.user:
+            return HttpResponse("Usuário não autenticado.")
+        else:
+            if request.user.status == 0:
+                return HttpResponse("<p>Aguardando autorização do administrador</p><p>Status: 0</p>")
+            elif request.user.status == 1:
+                return HttpResponse("<p>Bem vindo</p><p>Status: 1</p>")
+            else:
+                return HttpResponse("<p>Você não possui autorização.</p><p>Status: 2</p>")
 
 class UsuarioViewSet(viewsets.ModelViewSet, APIView):
     """
@@ -17,8 +33,6 @@ class UsuarioViewSet(viewsets.ModelViewSet, APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
     queryset = models.Usuario.objects.all().order_by('-date_joined')
     serializer_class = serializers.UsuarioSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('username', 'first_name', 'last_name')
 
     def get_queryset(self):
         if self.request.user.is_superuser:
