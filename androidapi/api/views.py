@@ -9,25 +9,28 @@ from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from androidapi.api import models, serializers
 from django.views import View
+from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
 
 class Index(APIView):
+    renderer_classes = (JSONRenderer, )
     permission_classes = (IsAuthenticated,)
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
     def get(self, request, format=None):
-        if not request.user:
-            return HttpResponse("Usuário não autenticado.")
+        if request.user.status == 0:
+            mensagem = 'Aguardando autorização do administrador.'
+        elif request.user.status == 1:
+            mensagem = 'Bem vindo.'
         else:
-            if request.user.status == 0:
-                return HttpResponse("<p>Aguardando autorização do administrador</p><p>Status: 0</p>")
-            elif request.user.status == 1:
-                return HttpResponse("<p>Bem vindo</p><p>Status: 1</p>")
-            else:
-                return HttpResponse("<p>Você não possui autorização.</p><p>Status: 2</p>")
+            mensagem = 'Você está proibido de acessar.'
+
+        objeto = {'mensagem': mensagem, 'status': request.user.status}
+        return Response(objeto)
 
 class UsuarioViewSet(viewsets.ModelViewSet, APIView):
     """
-    API endpoint for Usuario model
+    API endpoint para Usuario
     """
     permission_classes = (IsAuthenticated,)
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
