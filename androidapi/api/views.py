@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework import viewsets, filters
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, IsAdminUser 
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, PermissionDenied
@@ -11,6 +11,7 @@ from androidapi.api import models, serializers
 from django.views import View
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
+from .permissions import IsPostOrIsAuthenticated
 
 class Index(APIView):
     renderer_classes = (JSONRenderer,)
@@ -32,7 +33,7 @@ class UsuarioViewSet(viewsets.ModelViewSet, APIView):
     """
     API endpoint para Usuario
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsPostOrIsAuthenticated,)
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
     queryset = models.Usuario.objects.all().order_by('-date_joined')
     serializer_class = serializers.UsuarioSerializer
@@ -40,12 +41,12 @@ class UsuarioViewSet(viewsets.ModelViewSet, APIView):
     def get_queryset(self):
         if self.request.user.is_superuser:
             return models.Usuario.objects.all()
-        
+
         return models.Usuario.objects.all().filter(pk=self.request.user.id)
 
     def create(self, request, *args, **kwargs):
-        if not self.request.user.is_staff and not self.request.user.is_superuser:
-            raise PermissionDenied()
+        # if not self.request.user.is_staff and not self.request.user.is_superuser:
+        #     raise PermissionDenied()
 
         return super().create(request, *args, **kwargs)
 
