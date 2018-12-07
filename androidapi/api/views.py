@@ -13,6 +13,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from .permissions import IsPostOrIsAuthenticated
 from django.core import serializers as django_core_serializer
+import json
 
 class Index(APIView):
     renderer_classes = (JSONRenderer,)
@@ -20,17 +21,17 @@ class Index(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
     def get(self, request, format=None):
-        usuario = "anonimo"
         if request.user.status == 0:
             mensagem = 'Aguardando autorização do administrador.'
             usuario = request.user.username
         elif request.user.status == 1:
             mensagem = 'Bem vindo.'
-            usuario = django_core_serializer.serialize('json', models.Usuario.objects.filter(pk=request.user.id)) 
+            # Manipulações no json para melhor exibição
+            usuario_str = django_core_serializer.serialize('json', models.Usuario.objects.filter(pk=request.user.id))[1:-2].replace('"fields": {', '')
+            usuario = json.loads(usuario_str)
         else:
             mensagem = 'Você está proibido de acessar.'
             usuario = request.user.username
-
         objeto = {'mensagem': mensagem, 'status': request.user.status, 'usuario': usuario}
         return Response(objeto)
 
